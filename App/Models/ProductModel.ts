@@ -2,9 +2,10 @@ import { Model } from "./Models";
 
 export class ProductModel extends Model {
 
-    get_data(userQuery: string): any {
+    async get_data(userQuery: string) {
         this.query = userQuery;
-        return this.get_query();
+        let receive_data = await this.get_query();
+        return receive_data;
     }
 
 }

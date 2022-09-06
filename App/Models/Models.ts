@@ -1,5 +1,7 @@
+import { rejects } from "assert";
 import express from "express";
 import mysql from "mysql";
+import { resolve } from "path";
 
 const app = express();
 
@@ -16,7 +18,7 @@ export abstract class Model {
 
     abstract get_data(userQuery: string): any;
 
-    private db_connection(): void {
+    private async db_connection(): Promise<void> {
 
         this.connection = mysql.createConnection({
             host: Model.db_host,
@@ -26,22 +28,27 @@ export abstract class Model {
             database: Model.db_name,
         });
 
-        app.listen(Model.db_port);
+        /* app.listen(Model.db_port); */
         this.connection.connect();
     }
 
-    private db_close(): void {
+    private async db_close(): Promise<void> {
         this.connection.end();
     }
 
-    protected get_query(): any {
-        this.db_connection();
-        let res = this.connection.query(this.query, function (err: any, rows: any, fields: any) {
-            if (err) throw err;
-            console.log('The solution is: ', rows[0].solution);
-        });
+    protected async get_query(): Promise<any> {
+        return new Promise((resolve, rejects) => {
+            this.db_connection()
+            this.connection.query(this.query, function (err: any, rows: any[], fields: any) {
+                if (err) {
+                    console.error(err)
+                    return rejects(err);
+                }
+                console.log(rows)
+                return resolve(rows);
+            });
+        })
 
-        return res;
     }
 
 }

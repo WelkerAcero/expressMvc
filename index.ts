@@ -2,18 +2,15 @@ import express from "express";
 import { ProductModel } from "./App/Models/ProductModel";
 
 let obj = new ProductModel();
-
 const app = express();
 
-app.get('/', (req, res) => {
+app.use(express.json())
+
+app.get('/', async (req, res) => {
     /* console.log('Page index'); */
-    return obj.get_data("select * from products");
+    let data = await obj.get_data("select * from products")
+    res.send(data);
 })
-
-app.listen(3000, () => {
-    console.log("Initialization server");
-})
-
 
 app.get('/products', (req, res) => {
 
@@ -38,4 +35,8 @@ app.delete('/products', (req, res) => {
 
 app.patch('/products', (req, res) => {
     res.send('Updating a part of the product')
+})
+
+app.listen(3000, () => {
+    console.log("Initialization server");
 })
